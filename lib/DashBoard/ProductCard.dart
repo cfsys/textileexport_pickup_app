@@ -172,6 +172,7 @@ class _ProductCardState extends State<ProductCard> {
     );
   }
 
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
   updateQtyPopUp(){
     return Get.dialog(
        AlertDialog(
@@ -193,65 +194,70 @@ class _ProductCardState extends State<ProductCard> {
           content: Padding(
             padding: const EdgeInsets.only(left: 20.0, right: 20.0),
             child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: DataTable(
-                          decoration: BoxDecoration(),
-                          columnSpacing: 10,
-                          headingRowColor: WidgetStatePropertyAll(AppColors.grey_09),
-                          horizontalMargin: 8,
-                          border: TableBorder.all(color: AppColors.grey_09),
-                          columns: [
-                            DataColumn(label: Text("Size",style: AppTextStyle.labelMedium)),
-                            DataColumn(label: Text("MOQ/Design",style: AppTextStyle.labelMedium)),
-                            DataColumn(label: Text("Pending Qty",style: AppTextStyle.labelMedium)),
-                            DataColumn(label: Text("Update",style: AppTextStyle.labelMedium)),
-                          ],
-                          rows:  (pData.size_data??[]).map((e) {
-                            return DataRow(
-                                cells: [
-                                  DataCell(Text((e.vname??"").toString(),style: AppTextStyle.bodySmall,)),
-                                  DataCell(Text((e.moq??"").toString(),style: AppTextStyle.bodySmall,)),
-                                  DataCell(Text((e.qty??"").toString(),style: AppTextStyle.bodySmall,)),
-                                  DataCell(
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(vertical: 5),
-                                      child: TextFormField(
-                                        initialValue: (e.qty??"").toString(),
-                                        style: AppTextStyle.inputText,
-                                        keyboardType: TextInputType.number,
-                                        inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
-                                        textInputAction: TextInputAction.next,
-                                        onSaved: (value) {
-                                          e.update_qty = value.toString();
-                                          setState(() {});
-                                        },
-                                        decoration: Utils().inputFormDecorationSmall('Qty'),
+              child: Form(
+                key: formKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: DataTable(
+                            decoration: BoxDecoration(),
+                            columnSpacing: 10,
+                            headingRowColor: WidgetStatePropertyAll(AppColors.grey_09),
+                            horizontalMargin: 8,
+                            border: TableBorder.all(color: AppColors.grey_09),
+                            columns: [
+                              DataColumn(label: Text("Size",style: AppTextStyle.labelMedium)),
+                              DataColumn(label: Text("MOQ/Design",style: AppTextStyle.labelMedium)),
+                              DataColumn(label: Text("Pending Qty",style: AppTextStyle.labelMedium)),
+                              DataColumn(label: Text("Update",style: AppTextStyle.labelMedium)),
+                            ],
+                            rows:  (pData.size_data??[]).map((e) {
+                              return DataRow(
+                                  cells: [
+                                    DataCell(Text((e.vname??"").toString(),style: AppTextStyle.bodySmall,)),
+                                    DataCell(Text((e.moq??"").toString(),style: AppTextStyle.bodySmall,)),
+                                    DataCell(Text((e.qty??"").toString(),style: AppTextStyle.bodySmall,)),
+                                    DataCell(
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(vertical: 5),
+                                        child: TextFormField(
+                                          initialValue: (e.qty??"").toString(),
+                                          style: AppTextStyle.inputText,
+                                          keyboardType: TextInputType.number,
+                                          inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                          textInputAction: TextInputAction.next,
+                                          onSaved: (value) {
+                                            e.update_qty = value.toString();
+                                            setState(() {});
+                                          },
+                                          decoration: Utils().inputFormDecorationSmall('Qty'),
+                                        ),
                                       ),
-                                    ),
-                                  )
+                                    )
 
-                                ]
-                            );
-                          },).toList()
+                                  ]
+                              );
+                            },).toList()
+                        ),
                       ),
                     ),
-                  ),
-                  SizedBox(height: 15),
-                  Utils().primaryButton(
-                      context: context,
-                      btnText: "Save",
-                      onPress: () {
-                        commonApiController.updateQty(pData);
-                      },
-                  ),
-                  SizedBox(height: 20,)
-                ],
+                    SizedBox(height: 15),
+                    Utils().primaryButton(
+                        context: context,
+                        btnText: "Save",
+                        onPress: () {
+                          final form = formKey.currentState!;
+                          form.save();
+                          commonApiController.updateQty(pData);
+                        },
+                    ),
+                    SizedBox(height: 20,)
+                  ],
+                ),
               ),
             ),
           ),

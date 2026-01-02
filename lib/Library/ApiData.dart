@@ -202,7 +202,7 @@ class ApiData {
         return_data["msg"] = "Internal Server Error ${response.statusCode}";
       }
     } catch (e) {
-      print("Api Catch Error");
+      print("Api Catch Error $e");
       return_data["st"] = "error";
       return_data["msg"] = "Api Catch Error";
     }

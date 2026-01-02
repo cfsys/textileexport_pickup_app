@@ -1,4 +1,4 @@
-package com.cfsys.textile_exporter_admin
+package com.cfsys.textile_export_pickup
 
 import io.flutter.embedding.android.FlutterActivity
 

@@ -14,7 +14,6 @@ import 'package:textile_exporter_admin/Library/ApiData.dart';
 import 'package:textile_exporter_admin/Library/AppStorage.dart';
 import 'package:textile_exporter_admin/Library/AppTextStyle.dart';
 import 'package:intl/intl.dart';
-import 'package:textile_exporter_admin/Library/CropImage.dart';
 import 'package:textile_exporter_admin/Model/ImageModel.dart';
 import 'package:open_file/open_file.dart';
 import 'package:path_provider/path_provider.dart';

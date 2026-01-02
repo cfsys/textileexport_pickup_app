@@ -20,12 +20,16 @@ class SizeModel{
   String? moq;
   String? qty;
   String? update_qty;
+  String? td_id;
+  String? vid;
 
   SizeModel({
     this.vname,
     this.moq,
     this.qty,
     this.update_qty,
+    this.td_id,
+    this.vid,
   });
 
 
@@ -35,6 +39,8 @@ class SizeModel{
       moq: json['moq'],
       qty: json['qty'],
       update_qty: json['update_qty'],
+      td_id: json['td_id'],
+      vid: json['vid'],
     );
   }
 
@@ -44,6 +50,8 @@ class SizeModel{
     'moq':moq,
     'qty':qty,
     'update_qty':update_qty,
+    'td_id':td_id,
+    'vid':vid,
   };
 
 }

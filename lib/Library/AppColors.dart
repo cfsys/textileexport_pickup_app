@@ -6,7 +6,8 @@ import 'AppStorage.dart';
 
 class AppColors {
 
-  static Color primaryColor = const Color(0xFF3743bb);
+  //static Color primaryColor = const Color(0xFF3743bb);
+  static Color primaryColor = black;
   static Color primaryColorLight = const Color(0xFFe6ecf9);
 
   static Color splashColor = white_00;

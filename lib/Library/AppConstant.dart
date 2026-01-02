@@ -15,10 +15,10 @@ class AppConstant {
   static const String appVersionIos = '1';
 
   static const app_idcode = "textileexporteradmin";
-  static const String appName = 'Textile Exporter Admin';
+  static const String appName = 'Textile Export Pickup';
   static const appVersion = "1.0.0";
-  static const androidPackage = "com.cfsys.textile_exporter_admin";
-  static const iosPackage = "com.cfsys.textile_exporter_admin";
+  static const androidPackage = "com.cfsys.textile_export_pickup";
+  static const iosPackage = "com.cfsys.textile_export_pickup";
   static const firebaseApiKey = "AIzaSyBzUg3hBLmLV-qyyfRJKk6sgovkdInKjCU";
   static const firebaseAppId = "1:741580631861:ios:a82f89d7039eadb848a67c";
   static const storageBucket = "py-trading-57a67.appspot.com";

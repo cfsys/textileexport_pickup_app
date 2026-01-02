@@ -31,6 +31,7 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   void initState() {
+    commonApiController.selectedCategory.value = "All";
     commonApiController.refreshList();
     super.initState();
   }
@@ -110,11 +111,11 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             bottom: commonApiController.categoryList.isNotEmpty?PreferredSize(
-              preferredSize: const Size.fromHeight(40),
+              preferredSize: const Size.fromHeight(35),
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 15),
                 child: Obx(() => SizedBox(
-                    height: 40,
+                    height: 35,
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
@@ -124,28 +125,27 @@ class _HomePageState extends State<HomePage> {
                           padding: const EdgeInsets.only(right: 10),
                           child: GestureDetector(
                             onTap: () {
-                              if(commonApiController.selectedCategory.value == commonApiController.categoryList[index].id.toString()){
+                              if(commonApiController.selectedCategory.value == commonApiController.categoryList[index].toString()){
                                 commonApiController.selectedCategory.value = "";
                               }else{
-                                commonApiController.selectedCategory.value = commonApiController.categoryList[index].id.toString();
+                                commonApiController.selectedCategory.value = commonApiController.categoryList[index].toString();
                               }
                               commonApiController.refreshList();
                             },
                             child: Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 5),
                               decoration: BoxDecoration(
-                                  color: commonApiController.selectedCategory.value == commonApiController.categoryList[index].id.toString()
+                                  color: commonApiController.selectedCategory.value == commonApiController.categoryList[index].toString()
                                       ? AppColors.primaryColor
                                       : AppColors.white_00,
-                                  borderRadius: BorderRadius.circular(13),
-                                  border: Border.all(color: AppColors.primaryColor)
+                                  borderRadius: BorderRadius.circular(30),
                               ),
                               child: Center(
                                 child: Text(
-                                  commonApiController.categoryList[index].category_name.toString(),
-                                  style: commonApiController.selectedCategory.value == commonApiController.categoryList[index].id.toString()
+                                  commonApiController.categoryList[index].toString(),
+                                  style: commonApiController.selectedCategory.value == commonApiController.categoryList[index].toString()
                                       ? AppTextStyle.labelMedium.copyWith(color: Colors.white)
-                                      : AppTextStyle.labelMedium.copyWith(color: AppColors.primaryColor),
+                                      : AppTextStyle.labelMedium.copyWith(color: AppColors.grey_10),
                                 ),
                               ),
                             ),
