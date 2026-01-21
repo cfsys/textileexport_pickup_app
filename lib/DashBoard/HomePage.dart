@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:textile_exporter_admin/DashBoard/ProductCard.dart';
+import 'package:textile_exporter_admin/DashBoard/VendorCard.dart';
 import 'package:textile_exporter_admin/Library/AppTextStyle.dart';
 import 'package:textile_exporter_admin/Library/AppColors.dart';
 import 'package:textile_exporter_admin/Library/AppDrawer.dart';
@@ -54,6 +55,10 @@ class _HomePageState extends State<HomePage> {
             ),
             centerTitle: true,
             toolbarHeight: 70,
+            systemOverlayStyle: SystemUiOverlayStyle(
+              statusBarColor: AppColors.white_70
+            ),
+            backgroundColor: AppColors.white_70,
             title: Padding(
               padding: const EdgeInsets.symmetric(vertical: 10),
               child: TextFormField(
@@ -111,9 +116,9 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             bottom: commonApiController.categoryList.isNotEmpty?PreferredSize(
-              preferredSize: const Size.fromHeight(35),
+              preferredSize: const Size.fromHeight(40),
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
+                padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 5),
                 child: Obx(() => SizedBox(
                     height: 35,
                     child: ListView.builder(
@@ -177,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
                             itemBuilder: (BuildContext context, int pIndex) {
-                              return ProductCard(pData: commonApiController.productList[pIndex]);
+                              return VendorCard(pData: commonApiController.productList[pIndex]);
                             },
                           ),
                         ),

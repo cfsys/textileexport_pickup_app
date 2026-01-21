@@ -22,6 +22,8 @@ class SizeModel{
   String? update_qty;
   String? td_id;
   String? vid;
+  String? ptitle;
+  String? pimage;
 
   SizeModel({
     this.vname,
@@ -30,6 +32,8 @@ class SizeModel{
     this.update_qty,
     this.td_id,
     this.vid,
+    this.ptitle,
+    this.pimage,
   });
 
 
@@ -41,6 +45,8 @@ class SizeModel{
       update_qty: json['update_qty'],
       td_id: json['td_id'],
       vid: json['vid'],
+      ptitle: json['ptitle'],
+      pimage: json['pimage'],
     );
   }
 
@@ -52,6 +58,8 @@ class SizeModel{
     'update_qty':update_qty,
     'td_id':td_id,
     'vid':vid,
+    'ptitle':ptitle,
+    'pimage':pimage,
   };
 
 }

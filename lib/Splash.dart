@@ -18,7 +18,7 @@ class SplashScreen extends StatefulWidget {
 class _SplashScreenState extends State<SplashScreen> {
 
   bool isInternetOn = true;
-  final splashDelay = 2;
+  final splashDelay = 1;
 
   @override
   void initState() {
