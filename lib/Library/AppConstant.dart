@@ -16,6 +16,7 @@ class AppConstant {
 
   static const app_idcode = "textileexporteradmin";
   static const String appName = 'Textile Export Pickup';
+  static const String desktopAppName = 'Textile Export';
   static const appVersion = "1.0.0";
   static const androidPackage = "com.cfsys.textile_export_pickup";
   static const iosPackage = "com.cfsys.textile_export_pickup";

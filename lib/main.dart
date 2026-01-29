@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:textile_exporter_admin/Desktop/DesktopDashboard.dart';
 import 'Authentication/Login.dart';
 import 'package:get/get.dart';
 import 'DashBoard/HomePage.dart';
@@ -29,6 +30,7 @@ class MyApp extends StatelessWidget {
       },
       routes: {
         "/Dashboard":(context)=> const HomePage(),
+        "/DesktopDashboard":(context)=> const DesktopDashboard(),
         "/LogIn":(context)=> const LoginPage(),
       },
       title: AppConstant.appName,

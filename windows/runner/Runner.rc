@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.cfsys" "\0"
-            VALUE "FileDescription", "textile_exporter_admin" "\0"
+            VALUE "FileDescription", "Textile Exporter" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "textile_exporter_admin" "\0"
+            VALUE "InternalName", "Textile Exporter" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2025 com.cfsys. All rights reserved." "\0"
-            VALUE "OriginalFilename", "textile_exporter_admin.exe" "\0"
-            VALUE "ProductName", "textile_exporter_admin" "\0"
+            VALUE "OriginalFilename", "Textile Exporter.exe" "\0"
+            VALUE "ProductName", "Textile Exporter" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

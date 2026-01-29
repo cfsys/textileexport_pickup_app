@@ -20,7 +20,11 @@ class MyNavigator {
         Navigator.of(context).pushNamedAndRemoveUntil('/LogIn', (route) => false);
       } else {
         await getAllAPi();
-        Navigator.of(context).pushNamedAndRemoveUntil('/Dashboard', (route) => false);
+        if(Platform.isWindows){
+          Navigator.of(context).pushNamedAndRemoveUntil('/DesktopDashboard', (route) => false);
+        }else{
+          Navigator.of(context).pushNamedAndRemoveUntil('/Dashboard', (route) => false);
+        }
       }
   }
 

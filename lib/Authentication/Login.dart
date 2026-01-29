@@ -1,5 +1,6 @@
 
 import 'dart:convert';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -85,72 +86,80 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                         height: Get.height * 0.4,
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text("Login",style: AppTextStyle.headlineVeryVeryLarge),
-                      ],
-                    ),
-                    SizedBox(height: 15),
-                    TextFormField(
-                      controller: userName,
-                      style: AppTextStyle.inputText,
-                      keyboardType: TextInputType.text,
-                      textInputAction: TextInputAction.next,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
-                      validator: (value) {
-                        if (value.toString().trim().isEmpty) {
-                          return 'Please enter user name';
-                        } else {
-                          return null;
-                        }
-                      },
-                      onSaved: (value) {
-                        userName.text = value.toString();
-                      },
-                      decoration: Utils().inputFormDecoration('User Name'),
-                    ),
-                    SizedBox(height: 20,),
-                    TextFormField(
-                      controller: password,
-                      style: AppTextStyle.inputText,
-                      obscureText: isHiddenPassword,
-                      textInputAction: TextInputAction.next,
-                      onSaved: (newValue) {},
-                      decoration: Utils().inputFormDecoration("Password").copyWith(
-                        suffixIcon: InkWell(
-                          onTap: () {
-                            setState(() {
-                              isHiddenPassword = !isHiddenPassword;
-                            });
-                          },
-                          child: Icon(isHiddenPassword
-                              ? Icons.visibility_off
-                              : Icons.visibility),
-                        ),
+                    SizedBox(
+                      width: Platform.isWindows?Get.width* 0.3:Get.width,
+                      child: Column(
+                        children: [
+                          Row(
+                            children: [
+                              Text("Login",style: AppTextStyle.headlineVeryVeryLarge),
+                            ],
+                          ),
+                          SizedBox(height: 20),
+                          TextFormField(
+                            controller: userName,
+                            style: AppTextStyle.inputText,
+                            keyboardType: TextInputType.text,
+                            textInputAction: TextInputAction.next,
+                            autovalidateMode: AutovalidateMode.onUserInteraction,
+                            validator: (value) {
+                              if (value.toString().trim().isEmpty) {
+                                return 'Please enter user name';
+                              } else {
+                                return null;
+                              }
+                            },
+                            onSaved: (value) {
+                              userName.text = value.toString();
+                            },
+                            decoration: Utils().inputFormDecoration('User Name'),
+                          ),
+                          SizedBox(height: 20,),
+                          TextFormField(
+                            controller: password,
+                            style: AppTextStyle.inputText,
+                            obscureText: isHiddenPassword,
+                            textInputAction: TextInputAction.next,
+                            onSaved: (newValue) {},
+                            decoration: Utils().inputFormDecoration("Password").copyWith(
+                              suffixIcon: InkWell(
+                                onTap: () {
+                                  setState(() {
+                                    isHiddenPassword = !isHiddenPassword;
+                                  });
+                                },
+                                child: Icon(isHiddenPassword
+                                    ? Icons.visibility_off
+                                    : Icons.visibility),
+                              ),
+                            ),
+                            validator: (value) {
+                              if (value!.isEmpty) {
+                                return 'Enter Password ';
+                              }else{
+                                return null;
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 40.0),
+                          Utils().primaryButton(
+                              width: Get.width / 1.4,
+                              context: context,
+                              isLoading: isLoading,
+                              buttonType: ButtonType.large,
+                              btnText: 'Login',
+                              onPress: (){
+                                final form = loginFromKey.currentState;
+                                if (form!.validate()) {
+                                  form.save();
+                                  getAccessCode();
+                                }
+                              }
+                          ),
+                        ],
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Enter Password ';
-                        }else{
-                          return null;
-                        }
-                      },
                     ),
-                    const SizedBox(height: 30.0),
-                    Utils().primaryButton(
-                        width: Get.width / 1.4,
-                        context: context,
-                        isLoading: isLoading,
-                        buttonType: ButtonType.large,
-                        btnText: 'Login',
-                        onPress: (){
-                          final form = loginFromKey.currentState;
-                          if (form!.validate()) {
-                            form.save();
-                            getAccessCode();
-                          }
-                        }
-                    ),
+
                     const SizedBox(height: 40),
                   ],
                 ),

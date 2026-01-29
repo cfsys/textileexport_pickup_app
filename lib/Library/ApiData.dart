@@ -13,6 +13,7 @@ import 'ManageStore.dart';
 
 class CallApi {
   static const String _url = AppConstant.appUrl;
+  static const String importUrl = "http://localhost:9000";
 
   void printWrapped(text) {
     final pattern = RegExp('.{1,800}'); // 800 is the size of each chunk
@@ -28,21 +29,17 @@ class CallApi {
     return await http.post(Uri.parse(fullUrl), body: jsonEncode(data), headers: _setHeaders());
   }
 
-  deleteData(data, apiUrl)async {
-    var fullUrl = _url + apiUrl;
+  Future<http.Response> sendXmlData(String data) async {
+    var fullUrl = importUrl;
+
     print(fullUrl);
-    printWrapped(jsonEncode(data));
-    var head = _setHeaders();
-    head['Token'] = await AppStorage.getData("token")??"";
-    return await http.delete(Uri.parse(fullUrl), body: jsonEncode(data), headers: head );
-  }
-  patchData(data,apiUrl)async{
-    var fullUrl = _url + apiUrl;
-    print(fullUrl);
-    printWrapped(jsonEncode(data));
-    var head = _setHeaders();
-    head['Token'] = await AppStorage.getData("token")??"";
-    return await http.patch(Uri.parse(fullUrl), body: jsonEncode(data), headers: head );
+    printWrapped(data);
+
+    return await http.post(
+      Uri.parse(fullUrl),
+      headers: _setHeaders2(),
+      body: utf8.encode(data),
+    );
   }
 
   uploadData(data, apiUrl, filename) async {
@@ -130,11 +127,10 @@ class CallApi {
         //'Accept' : 'application/json',
       };
 
-  _setHeaders2() => {
-        // 'Authorization' : '4ccda7514adc0f13595a585205fb9761',
-        'Content-type': 'application/x-www-form-urlencoded; charset=UTF-8',
-        //'Accept' : 'application/json',
-      };
+  Map<String, String> _setHeaders2() => {
+    'Content-Type': 'application/xml; charset=utf-8',
+    'Accept': 'application/xml',
+  };
 }
 
 class ApiData {
@@ -209,60 +205,33 @@ class ApiData {
     return return_data;
   }
 
-  dynamic deletePostData(String method, dynamic data) async {
-    var return_data = {};
-    try {
-      data["aaid"] = await AppStorage.getData('aaid') ?? "";
-      final response = await CallApi().deleteData(data, method);
-      if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-        print(result);
-        if (result['status'] == 'success') {
-          return_data = result;
-          return_data["st"] = result['status'];
-          return_data["msg"] = result['message'];
-        } else {
-          return_data["st"] = result['status'];
-          return_data["msg"] = result['message'];
-        }
-      } else {
-        return_data["st"] = "error";
-        return_data["msg"] = "Internal Server Error ${response.statusCode}";
-      }
-    } catch (e) {
-      print("Api Catch Error");
-      return_data["st"] = "error";
-      return_data["msg"] = "Api Catch Error";
-    }
-    return return_data;
-  }
+  Future<Map<String, dynamic>> importCallData(String data) async {
+    Map<String, dynamic> returnData = {};
 
-  dynamic updatePostData(String method,dynamic data)async{
-    var return_data = {};
     try {
-      data["aaid"] = await AppStorage.getData('aaid') ?? "";
-      final response = await CallApi().patchData(data, method);
+      final response = await CallApi().sendXmlData(data);
+
+      print("Response Status: ${response.statusCode}");
+      print("Response Body: ${response.body}");
+
       if (response.statusCode == 200) {
-        var result = jsonDecode(response.body);
-        print(result);
-        if (result['status'] == 'success') {
-          return_data = result;
-          return_data["st"] = result['st'];
-          return_data["msg"] = result['msg'];
-        } else {
-          return_data["st"] = result['st'];
-          return_data["msg"] = result['msg'];
-        }
+
+          returnData['st'] = 'success';
+          returnData['msg'] = 'Imported Successfully';
+
       } else {
-        return_data["st"] = "error";
-        return_data["msg"] = "Internal Server Error ${response.statusCode}";
+        returnData['st'] = 'error';
+        returnData['msg'] = 'Server Error ${response.statusCode}';
       }
+
     } catch (e) {
-      print("Api Catch Error");
-      return_data["st"] = "error";
-      return_data["msg"] = "Api Catch Error";
+      print("API Error: $e");
+
+      returnData['st'] = 'error';
+      returnData['msg'] = 'API Exception: $e';
     }
-    return return_data;
+
+    return returnData;
   }
 
   dynamic getPostData(String method, dynamic data) async {
