@@ -8,6 +8,22 @@ import 'package:textile_exporter_admin/Model/SizeModel.dart';
 import '../Library/ApiData.dart';
 
 class CommonApiController extends GetxController implements GetxService{
+  RxString selectedUser = ''.obs;
+
+  RxList<dynamic> userList = [].obs;
+  Future getPickupPersonList() async {
+    try {
+      var data = {};
+      var res = await ApiData().postData('pickup_person_list', data);
+      if (res['st'] == "success") {
+        userList.value = (res['data']??[]);
+      }
+    } catch (e) {
+      debugPrint('print error: $e');
+    }
+    return userList;
+  }
+
   RxString selectedCategory = ''.obs;
 
   RxList<dynamic> categoryList = [].obs;
@@ -61,6 +77,7 @@ class CommonApiController extends GetxController implements GetxService{
       //data['offset'] = currentPage.value;
       data['search'] = searchController.value.text;
       data['area'] = selectedCategory.value.toString().trim() == "All"?"":selectedCategory.value;
+      data['pickup_person_id'] = selectedUser.value.toString().trim() == ""?"":selectedUser.value;
       var res = await ApiData().postData('get_pickup_list', data);
       if (res['st'] == 'success') {
         productList.value = ProductModelList(res['data']);

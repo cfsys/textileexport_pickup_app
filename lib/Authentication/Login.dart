@@ -46,7 +46,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         AppStorage.setData("ucode",(res['user']['ucode']??"").toString());
         AppStorage.setData("uid",(res['user']['id']??"").toString());
         AppStorage.setData("is_verify",(res['user']['is_verify']??"").toString());
-        MyNavigator().goToDashBoard(context);
+        MyNavigator().goToDashBoard();
       } else {
         Utils().showSnack(
           context: context,

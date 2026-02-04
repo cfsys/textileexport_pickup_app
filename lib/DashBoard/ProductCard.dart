@@ -61,8 +61,6 @@ class _ProductCardState extends State<ProductCard> {
                     child: CachedNetworkImage(
                       imageUrl: (pData.pimage??"").toString(),
                       fit: BoxFit.fill,
-                      memCacheHeight: 400,
-                      memCacheWidth: 400,
                       placeholder: (context, url) => Center(
                         child: Image.asset(
                           "assets/images/no_img.png",

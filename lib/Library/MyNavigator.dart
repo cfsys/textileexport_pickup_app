@@ -14,16 +14,16 @@ import 'AppTextStyle.dart';
 import 'UpdateAppPage.dart';
 
 class MyNavigator {
-  goToDashBoard(BuildContext context) async {
+  goToDashBoard() async {
       var aaid = await AppStorage.getData("uid") ?? "";
       if ((aaid ?? "").toString().trim().isEmpty) {
-        Navigator.of(context).pushNamedAndRemoveUntil('/LogIn', (route) => false);
+        Get.offAllNamed('/LogIn');
       } else {
-        await getAllAPi();
+        getAllAPi();
         if(Platform.isWindows){
-          Navigator.of(context).pushNamedAndRemoveUntil('/DesktopDashboard', (route) => false);
+          Get.offAllNamed('/DesktopDashboard');
         }else{
-          Navigator.of(context).pushNamedAndRemoveUntil('/Dashboard', (route) => false);
+          Get.offAllNamed('/Dashboard');
         }
       }
   }
@@ -31,7 +31,9 @@ class MyNavigator {
   CommonApiController commonApiController = Get.put(CommonApiController());
 
   getAllAPi()async{
+    commonApiController.getPickupPersonList();
     commonApiController.getCategoryList();
+    return;
   }
 
 
@@ -97,9 +99,9 @@ class MyNavigator {
         });
   }
 
-  static void goToSignOut(BuildContext context) async {
+  static void goToSignOut() async {
     SharedPreferences preferences = await SharedPreferences.getInstance();
     await preferences.clear();
-    MyNavigator().goToDashBoard(context);
+    MyNavigator().goToDashBoard();
   }
 }

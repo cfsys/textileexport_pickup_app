@@ -195,17 +195,17 @@ class _VendorCardState extends State<VendorCard> {
 
   void updateQtyBottomSheet() {
     Utils().showBottomSheet(
+      bottomSheetHeight: Get.height,
         content: SingleChildScrollView(
           child: Form(
             key: formKey,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 15,vertical: 20),
               child: Column(
-                mainAxisSize: MainAxisSize.min,
                 children: [
                   Row(
                     children: [
-                      Expanded(child: Text('Pickup Status Update',style: AppTextStyle.headlineLarge,)),
+                      Expanded(child: Text(widget.pData.vendorname.toString(),style: AppTextStyle.headlineLarge,)),
                       CloseButton(
                         onPressed: () {
                           Get.back();
@@ -279,7 +279,7 @@ class _VendorCardState extends State<VendorCard> {
                                               child: Text(
                                                 (sData.ptitle ?? "").toString(),
                                                 style: AppTextStyle.bodySmall,
-                                                maxLines: 2,
+                                                maxLines: 1,
                                                 overflow: TextOverflow.ellipsis,
                                               ),
                                             ),
@@ -289,44 +289,67 @@ class _VendorCardState extends State<VendorCard> {
                                         Row(
                                           crossAxisAlignment: .start,
                                           children: [
-                                            SizedBox(width: 80,child: Text("Size",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10))),
-                                            Expanded(child: Text(": ${sData.vname??""}",style: AppTextStyle.displayVerySmall))
-                                          ],
-                                        ),
-                                        Row(
-                                          crossAxisAlignment: .start,
-                                          children: [
-                                            SizedBox(width: 80,child: Text("MOQ",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10))),
-                                            Expanded(child: Text(": ${sData.moq??""}",style: AppTextStyle.displayVerySmall))
-                                          ],
-                                        ),
-                                        SizedBox(height: 5),
-
-                                        Row(
-                                          children: [
-                                            SizedBox(width: 80,child: Text("Update Qty",style: AppTextStyle.labelVerySmall,)),
                                             Expanded(
-                                              child: TextFormField(
-                                                initialValue: (sData.qty ?? "").toString(),
-                                                style: AppTextStyle.inputText,
-                                                keyboardType: TextInputType.number,
-                                                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
-                                                validator: (value) {
-                                                  if((value??"").toString().trim().isEmpty){
-                                                    return "Please enter qty";
-                                                  }
-                                                  return null;
-                                                },
-                                                textInputAction: TextInputAction.next,
-                                                onSaved: (value) {
-                                                  sData.update_qty = value.toString();
-                                                  setState(() {});
-                                                },
-                                                decoration: Utils().inputFormDecorationSmall('Qty'),
-                                              ),
+                                                child: RichText(
+                                                  text: TextSpan(
+                                                    style: AppTextStyle.displayVerySmall,
+                                                    children: [
+                                                      TextSpan(text: "Size : ",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10)),
+                                                      TextSpan(text: (sData.vname??"")),
+                                                      TextSpan(text: "   •   ",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10)),
+                                                      TextSpan(text: "MOQ : ",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10)),
+                                                      TextSpan(text: (sData.moq??"")),
+                                                    ],
+                                                  ),
+                                                )
                                             ),
                                           ],
                                         ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(left: 40),
+                                          child: Row(
+                                            crossAxisAlignment: .center,
+                                            children: [
+                                              Container(
+                                                decoration: BoxDecoration(
+                                                    borderRadius: BorderRadiusGeometry.circular(100),
+                                                    border: Border.all(color: AppColors.grey_10,width: 1)
+                                                ),
+                                                padding: EdgeInsets.symmetric(horizontal: 10,vertical: 1),
+                                                child: Row(
+                                                  crossAxisAlignment: .start,
+                                                  mainAxisSize: .min,
+                                                  children: [
+                                                    Text("Pending : ",style: AppTextStyle.labelVerySmall.copyWith(color: AppColors.grey_10)),
+                                                    Text(sData.qty??"",style: AppTextStyle.displayVerySmall)
+                                                  ],
+                                                ),
+                                              ),
+                                              SizedBox(width: 15),
+                                              Expanded(
+                                                child: TextFormField(
+                                                  initialValue: "",
+                                                  style: AppTextStyle.inputText,
+                                                  keyboardType: TextInputType.number,
+                                                  textAlign: TextAlign.end,
+                                                  inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))],
+                                                  validator: (value) {
+                                                    if((value??"").toString().trim().isEmpty){
+                                                      return "Please enter qty";
+                                                    }
+                                                    return null;
+                                                  },
+                                                  textInputAction: TextInputAction.next,
+                                                  onSaved: (value) {
+                                                    sData.update_qty = value.toString();
+                                                    setState(() {});
+                                                  },
+                                                  decoration: Utils().inputFormDecorationSmall('0'),
+                                                ),
+                                              )
+                                            ],
+                                          ),
+                                        )
                                       ],
                                     )
                                 )
@@ -344,8 +367,12 @@ class _VendorCardState extends State<VendorCard> {
                     onPress: () {
                       final form = formKey.currentState!;
                       form.save();
-                      Get.back();
-                      commonApiController.updateQty(pData);
+                      if((pData.size_data??[]).where((element) => (double.tryParse(element.update_qty??"")??0) != 0).isEmpty){
+                        Utils().showSnack(context: context, msg: "No item selected", snackType: SnackType.error);
+                      }else{
+                        Get.back();
+                        commonApiController.updateQty(pData);
+                      }
                     },
                   ),
                   SizedBox(height: 40,)

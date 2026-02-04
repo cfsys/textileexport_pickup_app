@@ -45,7 +45,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
           ListTile(
             onTap: () {
-              MyNavigator.goToSignOut(context);
+              MyNavigator.goToSignOut();
             },
             leading: Image.asset("assets/images/logout.png", height: 25, width: 25,color: Get.theme.primaryColor,),
             title:  Text(

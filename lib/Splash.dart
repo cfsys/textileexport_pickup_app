@@ -43,7 +43,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void navigationPage() {
-    MyNavigator().goToDashBoard(context);
+    MyNavigator().goToDashBoard();
   }
 
   @override

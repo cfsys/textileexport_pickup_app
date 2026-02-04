@@ -30,7 +30,7 @@ class _ForgetPasswordState extends State<ForgetPassword> {
       var res = await ApiData().postData('reset_password', data);
       if (res['st'] == 'success') {
         Utils().showSnack(context: context, msg: res["msg"] ?? "", snackType: SnackType.success);
-        MyNavigator().goToDashBoard(context);
+        MyNavigator().goToDashBoard();
       } else {
         if (!mounted) return;
         Utils().showSnack(context: context, msg: res["msg"] ?? "", snackType: SnackType.error);
