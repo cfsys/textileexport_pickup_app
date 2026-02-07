@@ -194,6 +194,8 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                           rows: desktopController.productList.asMap().entries.map((entry) {
                             int index = entry.key;
                             TransModel item = entry.value;
+                            List<String> orderName = (item.order_note ?? "").toString().trim().split(",").toSet().toList();
+
                             return DataRow(
                               selected: item.isSelected,
                               onSelectChanged: (val) => desktopController.toggleItemSelection(index, val),
@@ -203,7 +205,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                                 DataCell(Text(item.ac_name ?? "", style: AppTextStyle.labelMedium)),
                                 DataCell(Text(item.type ?? "", style: AppTextStyle.labelMedium)),
                                 DataCell(Text(item.order ?? "", style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.order_note ?? "", style: AppTextStyle.labelMedium)),
+                                DataCell(Text(orderName.join(","), style: AppTextStyle.labelMedium)),
                                 DataCell(Text(item.total ?? "", style: AppTextStyle.headlineMedium)),
                               ],
                             );
