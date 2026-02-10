@@ -112,13 +112,13 @@ class CommonApiController extends GetxController implements GetxService{
         data['vid_${sData.td_id.toString()}'] = (sData.vid??"").toString();
       }
       data['pid'] = (pData.pid??"").toString();
-      data['uid'] = await AppStorage.getData("uid");
+      data['uid'] = pData.sid.toString();
       data['td_id'] = tdList;
       var res = await ApiData().postData('update_pickup', data);
       if (res['st'] == 'success') {
         Get.back();
         refreshList();
-        Utils().showSnackGetX(msg: res['msg']??"Data Deleted Successfully", snackType: SnackType.success,);
+        Utils().showSnackGetX(msg: res['msg']??"Data Updated Successfully", snackType: SnackType.success,);
       } else{
         Get.back();
         Utils().showSnackGetX(msg: res['msg']??"Something went wrong!", snackType: SnackType.error,);

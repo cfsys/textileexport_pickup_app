@@ -21,7 +21,7 @@ class ProductModel {
   String? ptitle;
   String? slug;
   String? prod_sku;
-  String? pprice;
+  String? sid;
   String? pmoq;
   String? pqty;
   String? vid;
@@ -56,7 +56,7 @@ class ProductModel {
     this.ptitle,
     this.slug,
     this.prod_sku,
-    this.pprice,
+    this.sid,
     this.pmoq,
     this.pqty,
     this.vid,
@@ -92,7 +92,7 @@ class ProductModel {
     ptitle: (json["ptitle"]??"").toString(),
     slug: (json["slug"]??"").toString(),
     prod_sku: (json["prod_sku"]??"").toString(),
-    pprice:( json["pprice"]??"").toString(),
+    sid:( json["sid"]??"").toString(),
     pmoq:( json["pmoq"]??"").toString(),
     pqty:( json["pqty"]??"").toString(),
     vid:( json["vid"]??"").toString(),
@@ -128,7 +128,7 @@ class ProductModel {
     "slug": slug,
     "ptitle": ptitle,
     "prod_sku": prod_sku,
-    "pprice": pprice,
+    "sid": sid,
     "pmoq": pmoq,
     "pqty": pqty,
     "vid": vid,
