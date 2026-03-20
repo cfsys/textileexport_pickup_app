@@ -33,22 +33,23 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
   }
   setBlankData()async{
-    await Future.delayed(Duration.zero,() async{
-      var uid = await AppStorage.getData("uid") ?? "";
-      var chkUid = commonApiController.userList.where((element) => element['id'] == uid).toList();
-      if(chkUid.isNotEmpty){
-        commonApiController.selectedUser.value = uid.toString();
-      }else{
-        commonApiController.selectedUser.value = "";
-      }
-      commonApiController.selectedCategory.value = "All";
-      commonApiController.refreshList();
-    },);
-
+    var uid = await AppStorage.getData("uid") ?? "";
+    var chkUid = commonApiController.userList.where((element) => element['id'] == uid).toList();
+    if(chkUid.isNotEmpty){
+      commonApiController.selectedUser.value = uid.toString();
+    }else{
+      commonApiController.selectedUser.value = "";
+    }
+    commonApiController.selectedCategory.value = "All";
+    commonApiController.refreshList();
   }
   @override
   void initState() {
-    setBlankData();
+    ever(commonApiController.userList, (list) async {
+      if (list.isNotEmpty) {
+        await setBlankData();
+      }
+    });
     super.initState();
   }
 

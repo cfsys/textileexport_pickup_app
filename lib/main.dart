@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       onGenerateRoute: (RouteSettings settings ){
         switch(settings.name){
-          case "/Dashboard":Navigator.push(context,MaterialPageRoute(builder: (context)=>const HomePage()));
+          case "/DesktopDashboard":Navigator.push(context,MaterialPageRoute(builder: (context)=>const HomePage()));
           break;
           default:
             throw Exception("Invalid route:${settings.name}");

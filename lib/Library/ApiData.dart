@@ -33,12 +33,12 @@ class CallApi {
     var fullUrl = importUrl;
 
     print(fullUrl);
-    printWrapped(data);
+    printWrapped(data.replaceAll("\uFEFF", "").replaceAll(" ", " ")..replaceAll("\r", "").replaceAll("\r\n", "").replaceAll("\n", ""));
 
     return await http.post(
       Uri.parse(fullUrl),
       headers: _setHeaders2(),
-      body: utf8.encode(data),
+      body:utf8.encode(data.replaceAll("\uFEFF", "").replaceAll(" ", " ").replaceAll("\r", "").replaceAll("\r\n", "").replaceAll("\n", "")),
     );
   }
 
