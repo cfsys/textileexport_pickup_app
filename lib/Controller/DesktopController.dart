@@ -105,12 +105,12 @@ class DesktopController extends GetxController implements GetxService {
 
           if (res2['st'] == 'success') {
             var data = {"tid": id};
-            var res3 = await ApiData().postData('trans_update', data);
-            if (res3['st'] == 'success') {
-              Utils().showSnackGetX(msg: res3['msg']??"Update Successfully", snackType: SnackType.success);
-            }else{
-              Utils().showSnackGetX(msg: res3['msg']??"Something Went Wrong", snackType: SnackType.error);
-            }
+            //var res3 = await ApiData().postData('trans_update', data);
+            //if (res3['st'] == 'success') {
+            //  Utils().showSnackGetX(msg: res3['msg']??"Update Successfully", snackType: SnackType.success);
+            //}else{
+             // Utils().showSnackGetX(msg: res3['msg']??"Something Went Wrong", snackType: SnackType.error);
+            //}
           }else{
             Utils().showSnackGetX(msg: res2['msg']??"Something Went Wrong", snackType: SnackType.error);
           }

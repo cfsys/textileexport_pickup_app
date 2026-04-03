@@ -790,30 +790,33 @@ class Utils extends GetxController implements GetxService {
   Future selectDate({required BuildContext context, firstDate, lastDate, currDate}) async {
     final DateTime? picked = await showDatePicker(
       context: context,
+      initialDate: (currDate??"") == ""?DateTime.now():DateTime.parse(currDate),
+      initialDatePickerMode: DatePickerMode.day,
+      firstDate: firstDate==null?DateTime(1990):DateTime.parse(firstDate),
+      lastDate: lastDate==null?DateTime(2050):DateTime.parse(lastDate),
       builder: (context, child) {
         return Theme(
-          data: ThemeData.dark().copyWith(
-            colorScheme: ColorScheme.dark(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
               primary: AppColors.primaryColor,
               onPrimary: Colors.white,
-              surface: AppColors.white_00,
-              onSurface: Colors.black,
+              onSurface: AppColors.black, // body text color
             ),
-            dialogBackgroundColor:Colors.blue[900],
+            textButtonTheme: TextButtonThemeData(
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primaryColor, // button text color
+              ),
+            ),
           ),
           child: child!,
         );
       },
-      initialDate: DateTime.parse(currDate),
-      initialDatePickerMode: DatePickerMode.day,
-      firstDate: firstDate,
-      lastDate: lastDate,
     );
-    DateTime tSelectedDate = DateTime.parse(currDate);
+    DateTime? tSelectedDate;
     if (picked != null) {
       tSelectedDate = DateTime(picked.year, picked.month, picked.day,);
     }
-    return (tSelectedDate ?? "").toString();
+    return (tSelectedDate??"").toString();
   }
 
   Future<bool> onWillPop(BuildContext context) async {

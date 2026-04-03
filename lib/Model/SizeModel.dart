@@ -24,6 +24,9 @@ class SizeModel{
   String? vid;
   String? ptitle;
   String? pimage;
+  String? time;
+  String? order;
+  bool? isChecked;
 
   SizeModel({
     this.vname,
@@ -34,6 +37,9 @@ class SizeModel{
     this.vid,
     this.ptitle,
     this.pimage,
+    this.time,
+    this.order,
+    this.isChecked,
   });
 
 
@@ -47,6 +53,9 @@ class SizeModel{
       vid: json['vid'],
       ptitle: json['ptitle'],
       pimage: json['pimage'],
+      time: json['time'],
+      order: json['order'],
+      isChecked: json['isChecked']??false,
     );
   }
 
@@ -60,6 +69,9 @@ class SizeModel{
     'vid':vid,
     'ptitle':ptitle,
     'pimage':pimage,
+    'order':order,
+    'time':time,
+    'isChecked':isChecked,
   };
 
 }

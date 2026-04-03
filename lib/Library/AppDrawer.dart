@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:textile_exporter_admin/DashBoard/Report/ReportPage.dart';
 import 'package:textile_exporter_admin/Library/AppTextStyle.dart';
 import 'AppColors.dart';
 import 'MyNavigator.dart';
@@ -43,6 +44,17 @@ class _AppDrawerState extends State<AppDrawer> {
           const Divider(indent: 10, thickness: 0.5,color: AppColors.grey_10, endIndent: 10,),
 
 
+          ListTile(
+            onTap: () {
+              Navigator.pop(context);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const ReportPage()));
+            },
+            leading: Image.asset("assets/images/report.png", height: 25, width: 25,color: Get.theme.primaryColor,),
+            title:  Text(
+              'Report',
+              style: AppTextStyle.labelMedium,
+            ),
+          ),
           ListTile(
             onTap: () {
               MyNavigator.goToSignOut();
