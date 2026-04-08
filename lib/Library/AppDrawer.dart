@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:textile_exporter_admin/DashBoard/Report/ReportPage.dart';
@@ -43,7 +45,7 @@ class _AppDrawerState extends State<AppDrawer> {
 
           const Divider(indent: 10, thickness: 0.5,color: AppColors.grey_10, endIndent: 10,),
 
-
+          if(!Platform.isWindows)
           ListTile(
             onTap: () {
               Navigator.pop(context);
@@ -51,7 +53,7 @@ class _AppDrawerState extends State<AppDrawer> {
             },
             leading: Image.asset("assets/images/report.png", height: 25, width: 25,color: Get.theme.primaryColor,),
             title:  Text(
-              'Report',
+              'Pickup Report',
               style: AppTextStyle.labelMedium,
             ),
           ),

@@ -119,7 +119,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
           floatingActionButton: Visibility(
-            visible: desktopController.productList.any((e) => e.isSelected == true),
+            visible: desktopController.transList.any((e) => e.isSelected == true),
             child: SizedBox(
               height: 55,
               width: Get.width * 0.3,
@@ -168,66 +168,78 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
           ),
             body: desktopController.isLoading.value
               ? Center(child: SpinKitThreeBounce(color: AppColors.primaryColor, size: 30))
-              : SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    (desktopController.productList.isEmpty && !(desktopController.isLoading.value))?Center(
-                      child: Utils().noItem("No Data Found!"),
-                    ):SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
-                        child: DataTable(
-                          showCheckboxColumn: true,
-                          onSelectAll: (val) => desktopController.toggleSelectAll(val),
-                          columns: [
-                            DataColumn(label: Text('Invoice No', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Date', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Party Name', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Type', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Order', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Note', style: AppTextStyle.headlineLarge)),
-                            DataColumn(label: Text('Total', style: AppTextStyle.headlineLarge)),
-                          ],
-                          rows: desktopController.productList.asMap().entries.map((entry) {
-                            int index = entry.key;
-                            TransModel item = entry.value;
-                            List<String> orderName = (item.order_note ?? "").toString().trim().split(",").toSet().toList();
+              : ListView(
+                children: [
+                  (desktopController.transList.isEmpty && !(desktopController.isLoading.value))?Center(
+                    child: Utils().noItem("No Data Found!"),
+                  ):SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
+                      child: DataTable(
+                        showCheckboxColumn: true,
+                        onSelectAll: (val) => desktopController.toggleSelectAll(val),
+                        dataRowMinHeight: 56,
+                        dataRowMaxHeight: 110,
+                        columns: [
+                          DataColumn(label: Text('Invoice No', style: AppTextStyle.headlineLarge)),
+                          DataColumn(label: Text('Date', style: AppTextStyle.headlineLarge)),
+                          DataColumn(label: Text('Party Name', style: AppTextStyle.headlineLarge)),
+                          if(desktopController.selectedCategory.value == "2")
+                            DataColumn(label: Text('Address', style: AppTextStyle.headlineLarge)),
+                          DataColumn(label: Text('Order', style: AppTextStyle.headlineLarge)),
+                          DataColumn(label: Text('Note', style: AppTextStyle.headlineLarge)),
+                          DataColumn(label: Text('Total', style: AppTextStyle.headlineLarge)),
+                        ],
+                        rows: desktopController.transList.asMap().entries.map((entry) {
+                          int index = entry.key;
+                          TransModel item = entry.value;
+                          List<String> orderName = (item.order_note ?? "").toString().trim().split(",").toSet().toList();
 
-                            return DataRow(
-                              selected: item.isSelected,
-                              onSelectChanged: (val) => desktopController.toggleItemSelection(index, val),
-                              cells: [
-                                DataCell(Text(item.invoiceno ?? "", style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.tdate.toString().trim().isEmpty?"":DateFormat("dd-MM-yyyy").format(DateTime.parse(item.tdate ?? "")), style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.ac_name ?? "", style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.type ?? "", style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.order ?? "", style: AppTextStyle.labelMedium)),
-                                DataCell(Text(orderName.join(","), style: AppTextStyle.labelMedium)),
-                                DataCell(Text(item.total ?? "", style: AppTextStyle.headlineMedium)),
-                              ],
-                            );
-                          }).toList(),
-                        ),
+                          return DataRow(
+                            selected: item.isSelected,
+                            color: WidgetStatePropertyAll((item.notInTally??false)?AppColors.red_00.withAlpha(20):Colors.transparent),
+                            onSelectChanged: (val) => desktopController.toggleItemSelection(index, val),
+                            cells: [
+                              DataCell(Text(item.invoiceno ?? "", style: AppTextStyle.labelMedium)),
+                              DataCell(Text(item.tdate.toString().trim().isEmpty?"":DateFormat("dd-MM-yyyy").format(DateTime.parse(item.tdate ?? "")), style: AppTextStyle.labelMedium)),
+                              DataCell(Text(item.ac_name ?? "", style: AppTextStyle.labelMedium)),
+                              if(desktopController.selectedCategory.value == "2")
+                                DataCell(
+                                  ConstrainedBox(
+                                    constraints: const BoxConstraints(maxWidth: 240),
+                                    child: Text(
+                                      item.ship_address_text ?? "",
+                                      style: AppTextStyle.labelMedium,
+                                      softWrap: true,
+                                      maxLines: 5,
+                                      overflow: TextOverflow.visible,
+                                    ),
+                                  ),
+                                ),
+                              DataCell(Text(item.order ?? "", style: AppTextStyle.labelMedium)),
+                              DataCell(Text(orderName.join(","), style: AppTextStyle.labelMedium)),
+                              DataCell(Text(item.total ?? "", style: AppTextStyle.headlineMedium)),
+                            ],
+                          );
+                        }).toList(),
                       ),
                     ),
-                    const SizedBox(height: 10,),
+                  ),
+                  const SizedBox(height: 10,),
 
-                    desktopController.isLoading.value? Padding(
-                      padding: const EdgeInsets.only(bottom: 50.0),
-                      child: Center(
-                        child: SpinKitThreeBounce(
-                          color: AppColors.primaryColor,
-                          size: 30.0,
-                        ),
+                  desktopController.isLoading.value? Padding(
+                    padding: const EdgeInsets.only(bottom: 50.0),
+                    child: Center(
+                      child: SpinKitThreeBounce(
+                        color: AppColors.primaryColor,
+                        size: 30.0,
                       ),
-                    ):const SizedBox(),
+                    ),
+                  ):const SizedBox(),
 
-                    const SizedBox(height: 100,),
-                  ],
-                ),
+                  const SizedBox(height: 100,),
+                ],
               ),
         ),
       );

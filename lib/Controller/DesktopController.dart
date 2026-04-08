@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:textile_exporter_admin/Library/AppStorage.dart';
@@ -19,7 +21,7 @@ class DesktopController extends GetxController implements GetxService {
 
   Rx<TextEditingController> searchController = TextEditingController().obs;
 
-  RxList<TransModel> productList = <TransModel>[].obs;
+  RxList<TransModel> transList = <TransModel>[].obs;
   ScrollController scrollController = ScrollController();
 
   RxInt pageSize = 20.obs;
@@ -32,7 +34,7 @@ class DesktopController extends GetxController implements GetxService {
   void refreshList() async {
     await Future.delayed(Duration.zero, () async {
       isLastPage.value = false;
-      productList.value = [];
+      transList.value = [];
       currentPage.value = 0;
       isAllSelected.value = false;
       await getProductList();
@@ -47,6 +49,83 @@ class DesktopController extends GetxController implements GetxService {
     }
   }
 
+  Future<bool> _checkTallyConnection() async {
+    bool isTallyConnected = false;
+    try {
+      final request = await HttpClient()
+          .getUrl(Uri.parse(CallApi.importUrl));
+      final response = await request.close();
+
+      if (response.statusCode == 200) {
+        isTallyConnected = true;
+      }
+    } catch (e) {
+      print(e);
+    }
+
+    return isTallyConnected;
+  }
+
+  String _escapeXml(String input) {
+    return input
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&apos;');
+  }
+
+  Future<bool> checkLedgerExists(String ledgerName) async {
+    if (!await _checkTallyConnection()) {
+      return true;
+    }
+    final safeName = _escapeXml(ledgerName.trim());
+
+    final xml = """
+<ENVELOPE>
+ <HEADER>
+  <VERSION>1</VERSION>
+  <TALLYREQUEST>Export</TALLYREQUEST>
+  <TYPE>Collection</TYPE>
+  <ID>LedgerCheck</ID>
+ </HEADER>
+ <BODY>
+  <DESC>
+   <STATICVARIABLES>
+    <SVEXPORTFORMAT>\$\$SysName:XML</SVEXPORTFORMAT>
+   </STATICVARIABLES>
+   <TDL>
+    <TDLMESSAGE>
+     <COLLECTION NAME="LedgerCheck">
+      <TYPE>Ledger</TYPE>
+      <FETCH>Name</FETCH>
+      <FILTER>LedgerFilter</FILTER>
+     </COLLECTION>
+
+     <SYSTEM TYPE="Formulae" NAME="LedgerFilter">
+      \$Name = "$safeName"
+     </SYSTEM>
+
+    </TDLMESSAGE>
+   </TDL>
+  </DESC>
+ </BODY>
+</ENVELOPE>
+""";
+
+    try {
+      final response = await CallApi().sendXmlData(xml);
+
+      if (response.body.contains(safeName)) {
+        return true;
+      }
+
+      return false;
+    } catch (e) {
+      return false;
+    }
+  }
+
   Future getProductList() async {
     isLoading.value = true;
     try {
@@ -54,7 +133,11 @@ class DesktopController extends GetxController implements GetxService {
       data['ttype'] = selectedCategory.value.toString().trim() == "" ? "2" : selectedCategory.value;
       var res = await ApiData().postData('trans_list', data);
       if (res['st'] == 'success') {
-        productList.value = TransModelList(res['data']);
+        transList.value = TransModelList(res['data']);
+        for (var i = 0; i < transList.length; ++i) {
+          bool exists = await checkLedgerExists(transList[i].ac_name.toString());
+          transList[i].notInTally = !exists;
+        }
         isAllSelected.value = false;
       } else {
         Utils().showSnackGetX(msg: res['msg'], snackType: SnackType.error);
@@ -64,21 +147,21 @@ class DesktopController extends GetxController implements GetxService {
       Utils().showSnackGetX(snackType: SnackType.error, msg: "Catch Error!");
     }
     isLoading.value = false;
-    return productList;
+    return transList;
   }
 
   void toggleSelectAll(bool? value) {
     isAllSelected.value = value ?? false;
-    for (var item in productList) {
+    for (var item in transList) {
       item.isSelected = isAllSelected.value;
     }
-    productList.refresh();
+    transList.refresh();
   }
 
   void toggleItemSelection(int index, bool? value) {
-    productList[index].isSelected = value ?? false;
-    isAllSelected.value = productList.every((item) => item.isSelected);
-    productList.refresh();
+    transList[index].isSelected = value ?? false;
+    isAllSelected.value = transList.every((item) => item.isSelected);
+    transList.refresh();
   }
 
   RxString importingText = "".obs;
@@ -88,7 +171,7 @@ class DesktopController extends GetxController implements GetxService {
     importingText.value = "";
     isImporting.value = true;
     List<TransModel> selectedIds = [];
-    for (var product in productList) {
+    for (var product in transList) {
       if (product.isSelected) {
         selectedIds.add(product);
       }

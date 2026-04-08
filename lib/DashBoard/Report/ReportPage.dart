@@ -55,7 +55,7 @@ class _ReportPageState extends State<ReportPage> {
                 statusBarIconBrightness: Brightness.light,
               ),
               backgroundColor: AppColors.primaryColor,
-              title: Text("Report",style: AppTextStyle.appBarTitleStyle.copyWith(color: AppColors.white_00)),
+              title: Text("Pickup Report",style: AppTextStyle.appBarTitleStyle.copyWith(color: AppColors.white_00)),
               bottom: PreferredSize(
                   preferredSize: Size.fromHeight(60),
                   child: Padding(
@@ -80,6 +80,9 @@ class _ReportPageState extends State<ReportPage> {
                             onChanged: (val) async {
                               reportController.searchController.value.text = val.toString();
                               if (debounce?.isActive ?? false) debounce?.cancel();
+                              if(reportController.dateFormat.value != DateFormat('yyyy-MM-dd').format(DateTime.now())){
+                                reportController.setCurrentDate();
+                              }
                               debounce = Timer(const Duration(milliseconds: 500), () async {
                                 reportController.getProductList();
                               });
@@ -143,7 +146,7 @@ class _ReportPageState extends State<ReportPage> {
                         currDate: reportController.dateFormat.value,
                       );
                       if ((date ?? "") != "" || reportController.dateController.value.text.isEmpty) {
-                        reportController.dateFormat.value = date;
+                        reportController.dateFormat.value = DateFormat("yyyy-MM-dd").format(DateTime.parse(date.toString()));
                         reportController.dateController.value.text = DateFormat("dd-MM-yyyy").format(DateTime.parse(date.toString())).toString();
                         reportController.searchController.value.text = "";
                         reportController.getProductList();
@@ -237,6 +240,7 @@ class _ReportPageState extends State<ReportPage> {
               ),
             )
                 : RefreshIndicator(
+              color: AppColors.primaryColor,
               onRefresh: () async {
                 reportController.getProductList();
                 setState(() {});
@@ -263,6 +267,7 @@ class _ReportPageState extends State<ReportPage> {
                               (context, index) {
                             return ReportVendorCard(
                               pData: reportController.productList[index],
+                              index: index,
                             );
                           },
                           childCount: reportController.productList.length,

@@ -24,7 +24,9 @@ class TransModel{
   String? order_note;
   String? admin_note;
   String? total;
+  String? ship_address_text;
   String? ac_name;
+  bool? notInTally;
   bool isSelected;
 
   TransModel({
@@ -36,7 +38,9 @@ class TransModel{
     this.order_note,
     this.admin_note,
     this.total,
+    this.ship_address_text,
     this.ac_name,
+    this.notInTally,
     this.isSelected = false,
   });
 
@@ -51,7 +55,9 @@ class TransModel{
       order_note: json['order_note'],
       admin_note: json['admin_note'],
       total: json['total'],
+      ship_address_text: json['ship_address_text'],
       ac_name: json['ac_name'],
+      notInTally: json['isInTally']??false,
       isSelected: false,
     );
   }
@@ -66,6 +72,8 @@ class TransModel{
     'order_note':order_note,
     'admin_note':admin_note,
     'total':total,
+    'ship_address_text':ship_address_text,
+    'isInTally':notInTally,
     'ac_name':ac_name,
   };
 

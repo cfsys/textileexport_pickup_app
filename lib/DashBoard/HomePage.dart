@@ -225,6 +225,7 @@ class _HomePageState extends State<HomePage> {
               ),
             )
                 : RefreshIndicator(
+              color: AppColors.primaryColor,
               onRefresh: () async {
                 commonApiController.refreshList();
                 setState(() {});

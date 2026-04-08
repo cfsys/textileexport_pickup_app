@@ -16,6 +16,7 @@ Map<String,dynamic> SizeModelToJson(SizeModel data) => data.toJson();
 
 class SizeModel{
 
+  String? id;
   String? vname;
   String? moq;
   String? qty;
@@ -26,9 +27,10 @@ class SizeModel{
   String? pimage;
   String? time;
   String? order;
-  bool? isChecked;
+  bool? checked;
 
   SizeModel({
+    this.id,
     this.vname,
     this.moq,
     this.qty,
@@ -39,12 +41,13 @@ class SizeModel{
     this.pimage,
     this.time,
     this.order,
-    this.isChecked,
+    this.checked,
   });
 
 
   factory SizeModel.fromJson(Map<String, dynamic> json) {
     return SizeModel(
+      id: json['id'],
       vname: json['vname'],
       moq: json['moq'],
       qty: json['qty'],
@@ -55,12 +58,13 @@ class SizeModel{
       pimage: json['pimage'],
       time: json['time'],
       order: json['order'],
-      isChecked: json['isChecked']??false,
+      checked: json['checked']??false,
     );
   }
 
 
   Map<String,dynamic> toJson() => {
+    'id':id,
     'vname':vname,
     'moq':moq,
     'qty':qty,
@@ -71,7 +75,7 @@ class SizeModel{
     'pimage':pimage,
     'order':order,
     'time':time,
-    'isChecked':isChecked,
+    'checked':checked,
   };
 
 }

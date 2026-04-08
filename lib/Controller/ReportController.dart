@@ -15,10 +15,10 @@ class ReportController extends GetxController implements GetxService{
   void setCurrentDate() {
     dateController.value.text =
         DateFormat("dd-MM-yyyy").format(DateTime.now());
-    dateFormat.value = DateTime.now().toString();
+    dateFormat.value = DateFormat("yyyy-MM-dd").format(DateTime.now());
   }
   Rx<TextEditingController> dateController = TextEditingController(text: DateFormat("dd-MM-yyyy").format(DateTime.now()).toString()).obs;
-  RxString dateFormat = DateTime.now().toString().obs;
+  RxString dateFormat = DateFormat("yyyy-MM-dd").format(DateTime.now()).obs;
 
   RxList<ProductModel> productList = <ProductModel>[].obs;
 
@@ -30,9 +30,9 @@ class ReportController extends GetxController implements GetxService{
       if(searchController.value.text.trim().isNotEmpty){
         data['search'] = searchController.value.text;
       }else {
-        data['date'] = dateFormat.value;
+        data['pickup_date'] = dateFormat.value;
       }
-      var res = await ApiData().postData('get_pickup_list', data);
+      var res = await ApiData().postData('get_pickup_report_data', data);
       if (res['st'] == 'success') {
         productList.value = ProductModelList(res['data']);
       }else{
@@ -54,24 +54,17 @@ class ReportController extends GetxController implements GetxService{
 
 
 
-  updateQty(ProductModel pData)async{
+  updateCheck(SizeModel sData)async{
+    bool isSuccess = false;
     Utils().loadingGetX();
     try{
       var data = {};
-      List<String> tdList = [];
-      for (var i = 0; i < (pData.size_data??[]).length; ++i) {
-        SizeModel sData = (pData.size_data??[])[i];
-        tdList.add((sData.td_id??"").toString());
-        data['size_update_${sData.td_id.toString()}'] = (sData.update_qty??"").toString();
-        data['vid_${sData.td_id.toString()}'] = (sData.vid??"").toString();
-      }
-      data['pid'] = (pData.pid??"").toString();
-      data['uid'] = pData.sid.toString();
-      data['td_id'] = tdList;
-      var res = await ApiData().postData('update_pickup', data);
+      data['id'] = sData.id.toString();
+      data['is_checked'] = (sData.checked??false)?"1":"0";
+      var res = await ApiData().postData('report_check_update', data);
       if (res['st'] == 'success') {
+        isSuccess = true;
         Get.back();
-        getProductList();
         Utils().showSnackGetX(msg: res['msg']??"Data Updated Successfully", snackType: SnackType.success,);
       } else{
         Get.back();
@@ -81,5 +74,6 @@ class ReportController extends GetxController implements GetxService{
       Get.back();
       print('ERRO :- $e');
     }
+    return isSuccess;
   }
 }

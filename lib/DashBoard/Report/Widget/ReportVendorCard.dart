@@ -6,22 +6,10 @@ import '../../../Library/AppColors.dart';
 import '../../../Library/AppTextStyle.dart';
 import '../../../Model/ProductModel.dart';
 
-class ReportVendorCard extends StatefulWidget {
-  const ReportVendorCard({super.key,required this.pData});
+class ReportVendorCard extends StatelessWidget {
+  const ReportVendorCard({super.key,required this.pData, required this.index});
   final ProductModel pData;
-
-  @override
-  State<ReportVendorCard> createState() => _ReportVendorCardState();
-}
-
-class _ReportVendorCardState extends State<ReportVendorCard> {
-  ProductModel pData = ProductModel();
-  CommonApiController commonApiController = Get.find<CommonApiController>();
-  @override
-  void initState() {
-    pData = widget.pData;
-    super.initState();
-  }
+  final int index;
 
   @override
   Widget build(BuildContext context) {
@@ -30,41 +18,25 @@ class _ReportVendorCardState extends State<ReportVendorCard> {
       child: Container(
         decoration: BoxDecoration(
           border: Border.all(color: AppColors.grey_09,width: 0.8),
-          borderRadius: BorderRadius.circular(10),
+          borderRadius: BorderRadius.circular(16),
         ),
         margin: EdgeInsets.zero,
-        child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                crossAxisAlignment: .start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-
-                  Expanded(
-                    child: Text(
-                      (pData.vendorname ?? "").toString(),
-                      style: AppTextStyle.displayMedium,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                ],
+        child: Theme(
+          data: ThemeData(dividerColor: Colors.transparent),
+          child: ExpansionTile(
+              title: Text(
+                (pData.vendorname ?? "").toString(),
+                style: AppTextStyle.displayMedium,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-
-              if((pData.size_data??[]).isNotEmpty)
-                ListView.builder(
-                  padding: EdgeInsets.only(top: 5),
-                  itemCount: (pData.size_data??[]).length,
-                  physics: const NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemBuilder: (BuildContext context, int pIndex) {
-                    return ReportProductCard(sData: (pData.size_data??[])[pIndex]);
-                  },
-                ),
-            ],
+            childrenPadding: EdgeInsets.only(right: 10,left: 10,bottom: 10),
+            dense: true,
+            initiallyExpanded: index == 0,
+            iconColor: AppColors.primaryColor,
+            children: (pData.size_data??[]).map((e) {
+              return ReportProductCard(sData: e);
+            },).toList()
           ),
         ),
       ),
