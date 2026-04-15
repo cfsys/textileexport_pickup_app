@@ -78,7 +78,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                 child: Obx(() => SizedBox(
                   height: 45,
                   child: Align(
-                    alignment: AlignmentGeometry.centerLeft,
+                    alignment: Alignment.centerLeft,
                     child: ListView.builder(
                       shrinkWrap: true,
                       scrollDirection: Axis.horizontal,
@@ -118,7 +118,31 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
             ),
           ),
           floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-          floatingActionButton: Visibility(
+          floatingActionButton: desktopController.selectedCategory.value == "3" ? SizedBox(
+            height: 55,
+            width: Get.width * 0.3,
+            child: ElevatedButton(
+              onPressed: desktopController.isFetchingTallyVouchers.value
+                  ? null
+                  : () => desktopController.fetchTallyVouchersForFirstDateAndMapToTrans(),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primaryColor,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: Text(
+                desktopController.isFetchingTallyVouchers.value
+                    ? (desktopController.fetchingTallyText.value.isEmpty
+                    ? "Getting..."
+                    : desktopController.fetchingTallyText.value)
+                    : "Update",
+                style: AppTextStyle.displayLarge.copyWith(
+                  color: AppColors.white_00,
+                ),
+              ),
+            ),
+          ): Visibility(
             visible: desktopController.transList.any((e) => e.isSelected == true),
             child: SizedBox(
               height: 55,
@@ -177,7 +201,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                     child: ConstrainedBox(
                       constraints: BoxConstraints(minWidth: MediaQuery.of(context).size.width),
                       child: DataTable(
-                        showCheckboxColumn: true,
+                        showCheckboxColumn: desktopController.selectedCategory.value != "3",
                         onSelectAll: (val) => desktopController.toggleSelectAll(val),
                         dataRowMinHeight: 56,
                         dataRowMaxHeight: 110,
@@ -185,7 +209,7 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                           DataColumn(label: Text('Invoice No', style: AppTextStyle.headlineLarge)),
                           DataColumn(label: Text('Date', style: AppTextStyle.headlineLarge)),
                           DataColumn(label: Text('Party Name', style: AppTextStyle.headlineLarge)),
-                          if(desktopController.selectedCategory.value == "2")
+                          if(desktopController.selectedCategory.value == "2" || desktopController.selectedCategory.value == "3")
                             DataColumn(label: Text('Address', style: AppTextStyle.headlineLarge)),
                           DataColumn(label: Text('Order', style: AppTextStyle.headlineLarge)),
                           DataColumn(label: Text('Note', style: AppTextStyle.headlineLarge)),
@@ -199,12 +223,12 @@ class _DesktopDashboardState extends State<DesktopDashboard> {
                           return DataRow(
                             selected: item.isSelected,
                             color: WidgetStatePropertyAll((item.notInTally??false)?AppColors.red_00.withAlpha(20):Colors.transparent),
-                            onSelectChanged: (val) => desktopController.toggleItemSelection(index, val),
+                            onSelectChanged: desktopController.selectedCategory.value == "3" ? null : (val) => desktopController.toggleItemSelection(index, val),
                             cells: [
                               DataCell(Text(item.invoiceno ?? "", style: AppTextStyle.labelMedium)),
-                              DataCell(Text(item.tdate.toString().trim().isEmpty?"":DateFormat("dd-MM-yyyy").format(DateTime.parse(item.tdate ?? "")), style: AppTextStyle.labelMedium)),
+                              DataCell(Text((item.tdate ?? "").toString().trim().isEmpty?"":DateFormat("dd-MM-yyyy").format(DateTime.parse(item.tdate ?? "")), style: AppTextStyle.labelMedium)),
                               DataCell(Text(item.ac_name ?? "", style: AppTextStyle.labelMedium)),
-                              if(desktopController.selectedCategory.value == "2")
+                              if(desktopController.selectedCategory.value == "2" || desktopController.selectedCategory.value == "3")
                                 DataCell(
                                   ConstrainedBox(
                                     constraints: const BoxConstraints(maxWidth: 240),

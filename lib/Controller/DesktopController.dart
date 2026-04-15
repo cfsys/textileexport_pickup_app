@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:textile_exporter_admin/Library/AppStorage.dart';
 import 'package:textile_exporter_admin/Library/Utils.dart';
 import 'package:textile_exporter_admin/Model/ProductModel.dart';
@@ -15,6 +17,7 @@ class DesktopController extends GetxController implements GetxService {
   RxList<dynamic> categoryList = [
     {"id": "2", "name": "Sale"},
     {"id": "1", "name": "Purchase"},
+    {"id": "3", "name": "Sale-Imported"}
   ].obs;
 
   RxBool isLoading = false.obs;
@@ -76,9 +79,6 @@ class DesktopController extends GetxController implements GetxService {
   }
 
   Future<bool> checkLedgerExists(String ledgerName) async {
-    if (!await _checkTallyConnection()) {
-      return true;
-    }
     final safeName = _escapeXml(ledgerName.trim());
 
     final xml = """
@@ -130,14 +130,22 @@ class DesktopController extends GetxController implements GetxService {
     isLoading.value = true;
     try {
       var data = {};
-      data['ttype'] = selectedCategory.value.toString().trim() == "" ? "2" : selectedCategory.value;
+      data['ttype'] = ((selectedCategory.value.toString().trim() == "") || (selectedCategory.value.toString().trim() == "3")) ? "2" : selectedCategory.value;
+      data['extra_filter'] = selectedCategory.value.toString().trim() == "3" ? "sale_imported" : "";
       var res = await ApiData().postData('trans_list', data);
       if (res['st'] == 'success') {
         transList.value = TransModelList(res['data']);
-        for (var i = 0; i < transList.length; ++i) {
-          bool exists = await checkLedgerExists(transList[i].ac_name.toString());
-          transList[i].notInTally = !exists;
+        if(await _checkTallyConnection()){
+          for (var i = 0; i < transList.length; ++i) {
+            bool exists = await checkLedgerExists(transList[i].ac_name.toString());
+            transList[i].notInTally = !exists;
+          }
+        }else{
+          for (var i = 0; i < transList.length; ++i) {
+            transList[i].notInTally = false;
+          }
         }
+
         isAllSelected.value = false;
       } else {
         Utils().showSnackGetX(msg: res['msg'], snackType: SnackType.error);
@@ -167,6 +175,143 @@ class DesktopController extends GetxController implements GetxService {
   RxString importingText = "".obs;
   RxBool isImporting = false.obs;
 
+  RxBool isFetchingTallyVouchers = false.obs;
+  RxString fetchingTallyText = "".obs;
+
+  DateTime? _parseAnyDate(String? value) {
+    final v = (value ?? "").trim();
+    if (v.isEmpty) return null;
+    try {
+      return DateTime.parse(v);
+    } catch (_) {}
+    try {
+      return DateFormat("dd-MM-yyyy").parseStrict(v);
+    } catch (_) {}
+    try {
+      return DateFormat("dd/MM/yyyy").parseStrict(v);
+    } catch (_) {}
+    return null;
+  }
+
+  String _buildVoucherRegisterXml({required String fDate,required String tDate}) {
+    return """
+<ENVELOPE>
+  <HEADER>
+    <VERSION>1</VERSION>
+    <TALLYREQUEST>Export</TALLYREQUEST>
+    <TYPE>Data</TYPE>
+    <ID>Voucher Register</ID>
+  </HEADER>
+  <BODY>
+    <DESC>
+      <STATICVARIABLES>
+        <SVFROMDATE>$fDate</SVFROMDATE>
+        <SVTODATE>$tDate</SVTODATE>
+        <SVEXPORTFORMAT>\$\$SysName:XML</SVEXPORTFORMAT>
+      </STATICVARIABLES>
+    </DESC>
+  </BODY>
+</ENVELOPE>
+""";
+  }
+
+  Map<String, String> _extractVoucherXmlByRemoteId(String envelopeXml) {
+    final map = <String, String>{};
+    final voucherReg = RegExp(r"<VOUCHER\b([\s\S]*?)</VOUCHER>", caseSensitive: false);
+    final remoteIdReg = RegExp(r'REMOTEID="([^"]+)"', caseSensitive: false);
+
+    for (final m in voucherReg.allMatches(envelopeXml)) {
+      final voucherXml = "<VOUCHER${m.group(1) ?? ""}</VOUCHER>";
+      final idMatch = remoteIdReg.firstMatch(voucherXml);
+      final remoteId = (idMatch?.group(1) ?? "").trim();
+      if (remoteId.isNotEmpty) {
+        map[remoteId] = voucherXml;
+      }
+    }
+    return map;
+  }
+
+  String? _extractVoucherNumber(String voucherXml) {
+    final m = RegExp(r"<VOUCHERNUMBER>([\s\S]*?)</VOUCHERNUMBER>", caseSensitive: false)
+        .firstMatch(voucherXml);
+    final v = (m?.group(1) ?? "").trim();
+    return v.isEmpty ? null : v;
+  }
+
+  Future<void> fetchTallyVouchersForFirstDateAndMapToTrans() async {
+    if (isFetchingTallyVouchers.value) return;
+    if (transList.isEmpty) {
+      Utils().showSnackGetX(msg: "No Data Found!", snackType: SnackType.error);
+      return;
+    }
+
+    final dt = _parseAnyDate(transList.first.tdate.toString());
+    if (dt == null) {
+      Utils().showSnackGetX(msg: "Invalid Date in first row!", snackType: SnackType.error);
+      return;
+    }
+
+    if (!await _checkTallyConnection()) {
+      Utils().showSnackGetX(msg: "Tally not connected!", snackType: SnackType.error);
+      return;
+    }
+
+    isFetchingTallyVouchers.value = true;
+    fetchingTallyText.value = "Updating...";
+
+    try {
+      final fDate = DateFormat("yyyyMMdd").format(dt);
+      final tDate = DateFormat("yyyyMMdd").format(DateTime.now());
+      final xml = _buildVoucherRegisterXml(fDate: fDate,tDate: tDate);
+      final response = await CallApi().sendXmlData(xml);
+
+      if (response.statusCode != 200) {
+        Utils().showSnackGetX(
+          msg: "Tally error ${response.statusCode}",
+          snackType: SnackType.error,
+        );
+        return;
+      }
+
+      final voucherByRemoteId = _extractVoucherXmlByRemoteId(response.body);
+      for (final item in transList) {
+        final guid = (item.guid ?? "").trim();
+        if (guid.isEmpty) continue;
+        final vXml = voucherByRemoteId[guid];
+        if (vXml == null) continue;
+
+        item.tallyVoucherNumber = _extractVoucherNumber(vXml);
+        if((item.tallyVoucherNumber??"").toString().trim().isNotEmpty) {
+          await transUpdateInv(item.tid.toString(), item.tallyVoucherNumber ?? "");
+        }
+      }
+      refreshList();
+    } catch (e) {
+      Utils().showSnackGetX(msg: "Tally fetch error: $e", snackType: SnackType.error);
+    } finally {
+      isFetchingTallyVouchers.value = false;
+      fetchingTallyText.value = "";
+    }
+  }
+
+  Future<void> transUpdateInv(String tId,String invNo) async {
+    try {
+      var data = {"tid": tId.toString(),"inv_tally":invNo.toString()};
+      var res = await ApiData().postData('trans_update_tally_inv', data);
+      if (res['st'] == 'success') {
+        dynamic rData = res['xml'] ?? "";
+        var res2 = await ApiData().importCallData(rData);
+
+      } else {
+        Utils().showSnackGetX(msg: res['msg'], snackType: SnackType.error);
+      }
+    } catch (e) {
+      print('catch error in ($tId) : $e');
+      Utils().showSnackGetX(msg: "Api Catch Error $e", snackType: SnackType.error);
+    }
+    return;
+  }
+
   void importTransAdd() async {
     importingText.value = "";
     isImporting.value = true;
@@ -188,12 +333,12 @@ class DesktopController extends GetxController implements GetxService {
 
           if (res2['st'] == 'success') {
             var data = {"tid": id};
-            //var res3 = await ApiData().postData('trans_update', data);
-            //if (res3['st'] == 'success') {
-            //  Utils().showSnackGetX(msg: res3['msg']??"Update Successfully", snackType: SnackType.success);
-            //}else{
-             // Utils().showSnackGetX(msg: res3['msg']??"Something Went Wrong", snackType: SnackType.error);
-            //}
+            var res3 = await ApiData().postData('trans_update', data);
+            if (res3['st'] == 'success') {
+             Utils().showSnackGetX(msg: res3['msg']??"Update Successfully", snackType: SnackType.success);
+            }else{
+             Utils().showSnackGetX(msg: res3['msg']??"Something Went Wrong", snackType: SnackType.error);
+            }
           }else{
             Utils().showSnackGetX(msg: res2['msg']??"Something Went Wrong", snackType: SnackType.error);
           }

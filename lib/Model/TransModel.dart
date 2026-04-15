@@ -25,7 +25,10 @@ class TransModel{
   String? admin_note;
   String? total;
   String? ship_address_text;
+  String? tallyShipAddressText;
+  String? tallyVoucherNumber;
   String? ac_name;
+  String? guid;
   bool? notInTally;
   bool isSelected;
 
@@ -39,7 +42,10 @@ class TransModel{
     this.admin_note,
     this.total,
     this.ship_address_text,
+    this.tallyShipAddressText,
+    this.tallyVoucherNumber,
     this.ac_name,
+    this.guid,
     this.notInTally,
     this.isSelected = false,
   });
@@ -57,6 +63,7 @@ class TransModel{
       total: json['total'],
       ship_address_text: json['ship_address_text'],
       ac_name: json['ac_name'],
+      guid: json['guid'],
       notInTally: json['isInTally']??false,
       isSelected: false,
     );
@@ -73,6 +80,9 @@ class TransModel{
     'admin_note':admin_note,
     'total':total,
     'ship_address_text':ship_address_text,
+    'tallyShipAddressText':tallyShipAddressText,
+    'tallyVoucherNumber':tallyVoucherNumber,
+    'guid':guid,
     'isInTally':notInTally,
     'ac_name':ac_name,
   };
