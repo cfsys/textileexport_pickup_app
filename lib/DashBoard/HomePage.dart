@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -10,6 +11,7 @@ import 'package:textile_exporter_admin/Library/AppColors.dart';
 import 'package:textile_exporter_admin/Library/AppDrawer.dart';
 
 import '../Controller/CommonApiController.dart';
+import '../Controller/LocationUpdateController.dart';
 import '../Library/AppStorage.dart';
 import '../Library/Utils.dart';
 
@@ -45,9 +47,21 @@ class _HomePageState extends State<HomePage> {
   }
   @override
   void initState() {
+    if (!Platform.isWindows) {
+      Get.put(LocationUpdateController()).start();
+    }
     ever(commonApiController.userList, (list) async {
-      if (list.isNotEmpty) {
-        await setBlankData();
+      // `pickup_person_list` can legitimately be empty; we still must load pickup items.
+      await setBlankData();
+    });
+
+    // If `userList` was populated before this listener runs/replays (common after Splash APIs),
+    // bootstrap explicitly once we're mounted.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (commonApiController.userList.isNotEmpty) {
+        setBlankData();
+      } else {
+        commonApiController.refreshList();
       }
     });
     super.initState();

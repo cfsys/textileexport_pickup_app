@@ -7,6 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../Controller/CommonApiController.dart';
+import '../DashBoard/LocationGatePage.dart';
 import 'ApiData.dart';
 import 'AppColors.dart';
 import 'AppConstant.dart';
@@ -23,7 +24,7 @@ class MyNavigator {
         if(Platform.isWindows){
           Get.offAllNamed('/DesktopDashboard');
         }else{
-          Get.offAllNamed('/Dashboard');
+          Get.offAll(() => const LocationGatePage());
         }
       }
   }

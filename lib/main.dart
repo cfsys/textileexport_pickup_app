@@ -3,6 +3,7 @@ import 'package:textile_exporter_admin/Desktop/DesktopDashboard.dart';
 import 'Authentication/Login.dart';
 import 'package:get/get.dart';
 import 'DashBoard/HomePage.dart';
+import 'DashBoard/LocationGatePage.dart';
 import 'Library/AppConstant.dart';
 import 'Library/CustomTheme.dart';
 import 'Splash.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
       },
       routes: {
         "/Dashboard":(context)=> const HomePage(),
+        "/LocationGate":(context)=> const LocationGatePage(),
         "/DesktopDashboard":(context)=> const DesktopDashboard(),
         "/LogIn":(context)=> const LoginPage(),
       },
