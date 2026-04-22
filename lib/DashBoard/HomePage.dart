@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
-import 'package:get/get_connect/http/src/utils/utils.dart';
 import 'package:textile_exporter_admin/DashBoard/VendorCard.dart';
 import 'package:textile_exporter_admin/Library/AppTextStyle.dart';
 import 'package:textile_exporter_admin/Library/AppColors.dart';
@@ -40,30 +39,28 @@ class _HomePageState extends State<HomePage> {
     if(chkUid.isNotEmpty){
       commonApiController.selectedUser.value = uid.toString();
     }else{
-      commonApiController.selectedUser.value = "";
+      // If stored uid isn't part of pickup_person_list, pick the first person (if any)
+      // so we still show "selected person only" data.
+      if (commonApiController.userList.isNotEmpty) {
+        commonApiController.selectedUser.value =
+            (commonApiController.userList.first['id'] ?? "").toString();
+      } else {
+        commonApiController.selectedUser.value = "";
+      }
     }
     commonApiController.selectedCategory.value = "All";
-    commonApiController.refreshList();
+    // Don't call pending_pickup_list until pickup_person_list is loaded and selection is set.
+    if (commonApiController.selectedUser.value.toString().trim().isNotEmpty) {
+      commonApiController.refreshList();
+    }
   }
   @override
   void initState() {
     if (!Platform.isWindows) {
       Get.put(LocationUpdateController()).start();
     }
-    ever(commonApiController.userList, (list) async {
-      // `pickup_person_list` can legitimately be empty; we still must load pickup items.
-      await setBlankData();
-    });
+    setBlankData();
 
-    // If `userList` was populated before this listener runs/replays (common after Splash APIs),
-    // bootstrap explicitly once we're mounted.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (commonApiController.userList.isNotEmpty) {
-        setBlankData();
-      } else {
-        commonApiController.refreshList();
-      }
-    });
     super.initState();
   }
 

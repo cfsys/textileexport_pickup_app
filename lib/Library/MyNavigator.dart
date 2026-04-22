@@ -20,10 +20,10 @@ class MyNavigator {
       if ((aaid ?? "").toString().trim().isEmpty) {
         Get.offAllNamed('/LogIn');
       } else {
-        getAllAPi();
         if(Platform.isWindows){
           Get.offAllNamed('/DesktopDashboard');
         }else{
+          await getAllAPi();
           Get.offAll(() => const LocationGatePage());
         }
       }
@@ -32,8 +32,8 @@ class MyNavigator {
   CommonApiController commonApiController = Get.put(CommonApiController());
 
   getAllAPi()async{
-    commonApiController.getPickupPersonList();
-    commonApiController.getCategoryList();
+    await commonApiController.getPickupPersonList();
+    //commonApiController.getCategoryList();
     return;
   }
 

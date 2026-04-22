@@ -1,7 +1,6 @@
 
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
-import 'package:textile_exporter_admin/Library/AppStorage.dart';
 import 'package:textile_exporter_admin/Library/Utils.dart';
 import 'package:textile_exporter_admin/Model/ProductModel.dart';
 import 'package:textile_exporter_admin/Model/SizeModel.dart';
@@ -70,6 +69,12 @@ class CommonApiController extends GetxController implements GetxService{
   }
 
   Future getProductList() async {
+    // Requirement: do NOT call pending_pickup_list until pickup_person_id is selected.
+    if (selectedUser.value.toString().trim().isEmpty) {
+      isLoading.value = false;
+      productList.value = <ProductModel>[];
+      return <ProductModel>[];
+    }
     isLoading.value = true;
     List<ProductModel> pList = [];
     try {
@@ -78,7 +83,7 @@ class CommonApiController extends GetxController implements GetxService{
       data['search'] = searchController.value.text;
       data['area'] = selectedCategory.value.toString().trim() == "All"?"":selectedCategory.value;
       data['pickup_person_id'] = selectedUser.value.toString().trim() == ""?"":selectedUser.value;
-      var res = await ApiData().postData('get_pickup_list', data);
+      var res = await ApiData().postData('pending_pickup_list', data);
       if (res['st'] == 'success') {
         productList.value = ProductModelList(res['data']);
       }else{
